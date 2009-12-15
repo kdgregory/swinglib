@@ -255,9 +255,9 @@ extends TestCase
         {
             public void run()
             {
-                _watcher.addWatchedField(_fText);
-                _watcher.addWatchedField(_fButton);
-                _watcher.addWatchedField(_fList);
+                _watcher.addWatchedField(_fText)
+                        .addWatchedField(_fButton)
+                        .addWatchedField(_fList);
                 recordState();
             }
         });
