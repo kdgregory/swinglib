@@ -87,8 +87,11 @@ public class FieldWatcher
     /**
      *  Adds a watched field. Will attach a component-appropriate listener
      *  to watch for changes.
+     *
+     *  @return The watcher, allowing multiple components to be added using
+     *          chained calls.
      */
-    public void addWatchedField(JComponent theField)
+    public FieldWatcher addWatchedField(JComponent theField)
     {
         if (theField instanceof JTextComponent)
         {
@@ -107,6 +110,7 @@ public class FieldWatcher
             throw new IllegalArgumentException(
                     "does not support " + theField.getClass().getName());
         }
+        return this;
     }
 
 
