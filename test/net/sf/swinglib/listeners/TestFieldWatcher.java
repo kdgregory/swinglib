@@ -313,4 +313,54 @@ extends TestCase
         });
         assertState();
     }
+
+
+    public void testValidatedField() throws Exception
+    {
+        // setup: the field won't appear, even if it has valid initial state
+        SwingUtilities.invokeAndWait(new Runnable()
+        {
+            public void run()
+            {
+                _fText.setText("ab");
+                FieldValidator validator = new FieldValidator(_fText, "a*b+");
+                _watcher.addValidatedField(_fText, validator);
+                recordState();
+            }
+        });
+        assertState();
+
+        // verify that it appears when we set valid content
+        SwingUtilities.invokeAndWait(new Runnable()
+        {
+            public void run()
+            {
+                _fText.setText("b");
+                recordState();
+            }
+        });
+        assertState(_fText);
+
+        // ... disappears when we set invalid text
+        SwingUtilities.invokeAndWait(new Runnable()
+        {
+            public void run()
+            {
+                _fText.setText("a");
+                recordState();
+            }
+        });
+        assertState();
+
+        // ... and appears again when valid
+        SwingUtilities.invokeAndWait(new Runnable()
+        {
+            public void run()
+            {
+                _fText.setText("ab");
+                recordState();
+            }
+        });
+        assertState();
+    }
 }
