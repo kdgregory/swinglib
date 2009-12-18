@@ -67,6 +67,8 @@ public class FieldWatcher
 {
     private List<AbstractWatcher<?>> _watchers
             = new ArrayList<AbstractWatcher<?>>();
+    private Map<JComponent,FieldValidator> _validators
+            = new IdentityHashMap<JComponent,FieldValidator>();
     private List<JComponent> _controlled
             = new ArrayList<JComponent>();
     private Map<JComponent,AbstractWatcher<?>> _changed
@@ -85,8 +87,9 @@ public class FieldWatcher
 
 
     /**
-     *  Adds a watched field. Will attach a component-appropriate listener
-     *  to watch for changes.
+     *  Adds a field to the watch list. Will attach a component-appropriate
+     *  listener to watch for changes (note that there is no way to remove
+     *  this listener).
      *
      *  @return The watcher, allowing multiple components to be added using
      *          chained calls.
@@ -111,6 +114,17 @@ public class FieldWatcher
                     "does not support " + theField.getClass().getName());
         }
         return this;
+    }
+
+
+    /**
+     *  Adds a validated field to the watch list. Changes to the field will
+     *  only be recorded if the validator claims that the field is valid.
+     */
+    public FieldWatcher addValidatedField(JTextComponent theField, FieldValidator validator)
+    {
+        _validators.put(theField, validator);
+        return addWatchedField(theField);
     }
 
 
@@ -231,6 +245,12 @@ public class FieldWatcher
             boolean hasChanged = _initialLength != doc.getLength();
             if (!hasChanged)
                 hasChanged = !_initialValue.equals(getDocumentText(doc));
+
+            // if there's a validator, make sure we're now valid
+            FieldValidator validator = _validators.get(getComponent());
+            if (hasChanged && (validator != null))
+                hasChanged = validator.isValid();
+
             markChanged(hasChanged);
         }
 
