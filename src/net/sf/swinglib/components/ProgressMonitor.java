@@ -21,7 +21,10 @@ import java.util.EnumSet;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,7 +46,7 @@ import net.sf.swinglib.SwingUtil;
  *  is it disposed by calling {@link #hide}; you must explicitly call
  *  {@link #dispose}.
  */
-public class ProgressDialogController
+public class ProgressMonitor
 {
     /**
      *  Options to control the dialog's appearance. Rather than providing a
@@ -65,7 +68,20 @@ public class ProgressDialogController
         CENTER,
 
         /**
-         *  If present, the progress bar displays completion percentage
+         *  If present, the dialog will be constructed without a progress
+         *  bar (typically this is used with {@link #SHOW_STATUS}).
+         */
+        NO_PROGRESS_BAR,
+
+        /**
+         *  If present, the dialog will include space for a status message
+         *  below the progress bar.
+         */
+        SHOW_STATUS,
+
+        /**
+         *  If present, the progress bar displays completion percentage;
+         *  by default it shows the count.
          */
         SHOW_PERCENT_COMPLETE
     }
@@ -82,7 +98,8 @@ public class ProgressDialogController
     private EnumSet<Options> _options = EnumSet.noneOf(Options.class);
 
     private JDialog _theDialog;
-    private JProgressBar _progressBar;
+    private JProgressBar _fProgress;
+    private JLabel _fStatus;
 
     private volatile Integer _min;
     private volatile Integer _max;
@@ -100,16 +117,16 @@ public class ProgressDialogController
      *  @param title    Text to display in the dialog window's title area; may
      *                  be <code>null</code>, in which case the title is left
      *                  empty.
-     *  @param text     Text to display in the body of the dialog; may be
-     *                  <code>null</code>, in which case the dialog just
-     *                  shows a progress bar (and optional cancel button).
+     *  @param text     Text to display in the body of the dialog; usually
+     *                  gives an overall description of what's happening. May
+     *                  be <code>null</code>.
      *  @param action   If not <code>null</code>, the dialog will display a
      *                  single button that invokes this action (normally used
-     *                  to cancel the operation).
+     *                  for a cancel button).
      *  @param options  Zero or more options controlling the dialog's appearance
      *                  and behavior.
      */
-    public ProgressDialogController(JFrame owner, String title, String text,
+    public ProgressMonitor(JFrame owner, String title, String text,
                                     Action action, Options... options)
     {
         _owner = owner;
@@ -123,21 +140,22 @@ public class ProgressDialogController
 
 
     /**
-     *  Convenience constructor for a non-modal dialog that does not have an
-     *  action button.
+     *  Convenience constructor for a dialog that does not have an action button.
      *
      *  @param owner    The dialog owner; may be <code>null</code>, in which
      *                  case Swing will generate a hidden owner frame.
      *  @param title    Text to display in the dialog window's title area; may
      *                  be <code>null</code>, in which case the title is left
      *                  empty.
-     *  @param text     Text to display in the body of the dialog; may be
-     *                  <code>null</code>, in which case the dialog just
-     *                  shows a progress bar (and optional cancel button).
+     *  @param text     Text to display in the body of the dialog; usually
+     *                  gives an overall description of what's happening. May
+     *                  be <code>null</code>.
+     *  @param options  Zero or more options controlling the dialog's appearance
+     *                  and behavior.
      */
-    public ProgressDialogController(JFrame owner, String title, String text)
+    public ProgressMonitor(JFrame owner, String title, String text, Options... options)
     {
-        this(owner, title, text, null);
+        this(owner, title, text, null, options);
     }
 
 
@@ -153,7 +171,7 @@ public class ProgressDialogController
      *  @returns The controller itself, as a convenience for construct-and-show
      *           usage (but still assigning to a variable).
      */
-    public ProgressDialogController show()
+    public ProgressMonitor show()
     {
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -227,7 +245,31 @@ public class ProgressDialogController
         {
             public void run()
             {
+                // bozo check
+                if (_fProgress == null)
+                    return;
+
                 internalSetProgress();
+            }
+        });
+    }
+
+
+    /**
+     *  Sets the status text, if the dialog was constructed with that option.
+     */
+    public void setStatus(final String message)
+    {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                // bozo check
+                if (_fStatus == null)
+                    return;
+
+                _fStatus.setText(message);
+                _theDialog.pack();
             }
         });
     }
@@ -245,6 +287,10 @@ public class ProgressDialogController
         {
             public void run()
             {
+                // bozo check
+                if (_fProgress == null)
+                    return;
+
                 reset();
                 internalSetProgress();
             }
@@ -270,9 +316,25 @@ public class ProgressDialogController
             contentPane.add(panel, BorderLayout.NORTH);
         }
 
-        _progressBar = new JProgressBar();
-        _progressBar.setMinimumSize(new Dimension(150, 30));
-        contentPane.add(_progressBar, BorderLayout.CENTER);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        contentPane.add(centerPanel, BorderLayout.CENTER);
+
+        if (!_options.contains(Options.NO_PROGRESS_BAR))
+        {
+            _fProgress = new JProgressBar();
+            _fProgress.setMinimumSize(new Dimension(150, 30));
+            _fProgress.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            centerPanel.add(_fProgress);
+        }
+
+        if (_options.contains(Options.SHOW_STATUS))
+        {
+            _fStatus = new JLabel(" ");
+            _fStatus.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            centerPanel.add(Box.createVerticalStrut(8));
+            centerPanel.add(_fStatus);
+        }
 
         if (_action != null)
         {
@@ -301,17 +363,17 @@ public class ProgressDialogController
     {
         if ((_min == null) || (_max == null))
         {
-            _progressBar.setIndeterminate(true);
-            _progressBar.setStringPainted(false);
+            _fProgress.setIndeterminate(true);
+            _fProgress.setStringPainted(false);
         }
         else
         {
-            _progressBar.setIndeterminate(false);
-            _progressBar.setStringPainted(_options.contains(Options.SHOW_PERCENT_COMPLETE));
-            _progressBar.setMinimum(_min.intValue());
-            _progressBar.setMaximum(_max.intValue());
+            _fProgress.setIndeterminate(false);
+            _fProgress.setStringPainted(_options.contains(Options.SHOW_PERCENT_COMPLETE));
+            _fProgress.setMinimum(_min.intValue());
+            _fProgress.setMaximum(_max.intValue());
             if (_cur != null)
-                _progressBar.setValue(_cur.intValue());
+                _fProgress.setValue(_cur.intValue());
         }
     }
 }
