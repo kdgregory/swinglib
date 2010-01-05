@@ -269,7 +269,6 @@ public class ProgressMonitor
                     return;
 
                 _fStatus.setText(message);
-                _theDialog.pack();
             }
         });
     }
@@ -330,7 +329,8 @@ public class ProgressMonitor
 
         if (_options.contains(Options.SHOW_STATUS))
         {
-            _fStatus = new JLabel(" ");
+            _fStatus = new JLabel();
+            _fStatus.setPreferredSize(new Dimension(300, 36));
             _fStatus.setAlignmentX(JComponent.CENTER_ALIGNMENT);
             centerPanel.add(Box.createVerticalStrut(8));
             centerPanel.add(_fStatus);
