@@ -62,7 +62,7 @@ public class TestAsynchronousOperation extends TestCase
     {
         public boolean      _callbackOnEventThread;
         public Object       _callbackResult;
-        public Exception    _callbackException;
+        public Throwable    _callbackException;
 
         @Override
         protected void onSuccess(Object result)
@@ -72,7 +72,7 @@ public class TestAsynchronousOperation extends TestCase
         }
 
         @Override
-        protected void onFailure(Exception e)
+        protected void onFailure(Throwable e)
         {
             _callbackOnEventThread = SwingUtilities.isEventDispatchThread();
             _callbackException = e;
