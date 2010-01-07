@@ -21,6 +21,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JToggleButton;
@@ -69,8 +70,10 @@ public class FieldWatcher
             = new ArrayList<AbstractWatcher<?>>();
     private Map<JComponent,FieldValidator> _validators
             = new IdentityHashMap<JComponent,FieldValidator>();
-    private List<JComponent> _controlled
+    private List<JComponent> _controlledComponents
             = new ArrayList<JComponent>();
+    private List<Action> _controlledActions
+            = new ArrayList<Action>();
     private Map<JComponent,AbstractWatcher<?>> _changed
             = new IdentityHashMap<JComponent,AbstractWatcher<?>>();
 
@@ -80,9 +83,41 @@ public class FieldWatcher
      *  be disabled when {@link #reset} is called, enabled when a watched field
      *  changes.
      */
-    public FieldWatcher(JComponent... controlledComps)
+    public FieldWatcher(JComponent... controlled)
     {
-        _controlled.addAll(Arrays.asList(controlledComps));
+        _controlledComponents.addAll(Arrays.asList(controlled));
+    }
+
+    /**
+     *  Creates an instance with zero or more controlled actions. These will
+     *  be disabled when {@link #reset} is called, enabled when a watched field
+     *  changes.
+     */
+    public FieldWatcher(Action... controlled)
+    {
+        _controlledActions.addAll(Arrays.asList(controlled));
+    }
+
+
+    /**
+     *  Adds a controlled component after construction. This is useful if you
+     *  want to mix components and actions.
+     */
+    public FieldWatcher addControlled(JComponent controlled)
+    {
+        _controlledComponents.add(controlled);
+        return this;
+    }
+
+
+    /**
+     *  Adds a controlled action after construction. This is useful if you
+     *  want to mix components and actions.
+     */
+    public FieldWatcher addControlled(Action controlled)
+    {
+        _controlledActions.add(controlled);
+        return this;
     }
 
 
@@ -163,8 +198,10 @@ public class FieldWatcher
     private void updateControlled()
     {
         boolean enable = (_changed.size() > 0);
-        for (JComponent comp : _controlled)
+        for (JComponent comp : _controlledComponents)
             comp.setEnabled(enable);
+        for (Action action : _controlledActions)
+            action.setEnabled(enable);
     }
 
 
