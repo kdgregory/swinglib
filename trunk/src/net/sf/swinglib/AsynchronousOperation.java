@@ -48,7 +48,7 @@ implements Runnable
                 }
             });
         }
-        catch (final Exception e)
+        catch (final Throwable e)
         {
             SwingUtilities.invokeLater(new Runnable()
             {
@@ -87,7 +87,7 @@ implements Runnable
      *  </code> threw an exception. Application code typically overrides
      *  to do something with that exception.
      */
-    protected void onFailure(Exception e)
+    protected void onFailure(Throwable e)
     {
         throw new RuntimeException(e);
     }
