@@ -44,6 +44,7 @@ implements Runnable
             {
                 public void run()
                 {
+                    onComplete();
                     onSuccess(result);
                 }
             });
@@ -54,6 +55,7 @@ implements Runnable
             {
                 public void run()
                 {
+                    onComplete();
                     onFailure(e);
                 }
             });
@@ -69,6 +71,17 @@ implements Runnable
      */
     protected abstract T performOperation()
     throws Exception;
+
+
+    /**
+     *  This method is invoked on the event thread when the operation completes,
+     *  <em>regardless of whether it succeeded or failed</em>. It exists so that
+     *  subclasses can manage user feedback (such as resetting a busy cursor).
+     */
+    protected void onComplete()
+    {
+        // default implementation does nothing
+    }
 
 
     /**

@@ -61,8 +61,15 @@ public class TestAsynchronousOperation extends TestCase
     extends AsynchronousOperation<Object>
     {
         public boolean      _callbackOnEventThread;
+        public boolean      _onCompleteCalled;
         public Object       _callbackResult;
         public Throwable    _callbackException;
+
+        @Override
+        protected void onComplete()
+        {
+            _onCompleteCalled = true;
+        }
 
         @Override
         protected void onSuccess(Object result)
@@ -116,9 +123,11 @@ public class TestAsynchronousOperation extends TestCase
         SwingUtilities.invokeAndWait(new NullRunnable());
 
         assertTrue("callback on event thread", testOperation._callbackOnEventThread);
+        assertTrue("onComplete() called", testOperation._onCompleteCalled);
         assertEquals("result", result, testOperation._callbackResult);
         assertNull("exception", testOperation._callbackException);
     }
+
 
     public void testFailure()
     throws Exception
@@ -138,6 +147,7 @@ public class TestAsynchronousOperation extends TestCase
         SwingUtilities.invokeAndWait(new NullRunnable());
 
         assertTrue("callback on event thread", testOperation._callbackOnEventThread);
+        assertTrue("onComplete() called", testOperation._onCompleteCalled);
         assertEquals("exception", result, testOperation._callbackException);
         assertNull("result", testOperation._callbackResult);
     }
