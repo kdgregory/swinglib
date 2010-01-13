@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package net.sf.swinglib.listeners;
+package net.sf.swinglib.field;
 
 import java.util.Collection;
 
@@ -24,6 +24,9 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import net.sf.swinglib.field.FieldValidator;
+import net.sf.swinglib.field.FieldWatcher;
 
 import junit.framework.TestCase;
 

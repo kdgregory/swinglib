@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package net.sf.swinglib.listeners;
+package net.sf.swinglib.field;
 
 import java.awt.Color;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
+
+import net.sf.swinglib.field.FieldValidator;
 
 import junit.framework.TestCase;
 
