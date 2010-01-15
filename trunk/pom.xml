@@ -6,7 +6,7 @@
 	<groupId>net.sf.swinglib</groupId>
 	<artifactId>swinglib</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>swinglib</name>
 	<url>http://sourceforge.net/projects/swinglib/</url>
 
