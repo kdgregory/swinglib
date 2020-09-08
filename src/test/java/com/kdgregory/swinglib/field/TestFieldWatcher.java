@@ -27,9 +27,6 @@ import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
 
-import com.kdgregory.swinglib.field.FieldValidator;
-import com.kdgregory.swinglib.field.FieldWatcher;
-
 
 public class TestFieldWatcher
 extends TestCase
@@ -48,23 +45,23 @@ extends TestCase
 //----------------------------------------------------------------------------
 
     // the fields that we will test
-    private JFrame _theFrame;
-    private JTextField _fText;
-    private JCheckBox _fButton;
-    private JList _fList;
+    private JFrame theFrame;
+    private JTextField fText;
+    private JCheckBox fButton;
+    private JList<String> fList;
 
     // this button is used to validate the response
-    private JButton _theButton;
+    private JButton theButton;
 
     // this variable is used to exchange state between event and test threads
     // it must be manually updated with the state of the button
-    private volatile boolean _buttonState;
+    private volatile boolean buttonState;
 
     // this list will be filled by calling FieldWatcher.getChangedComponents()
-    private Collection<JComponent> _changes;
+    private Collection<JComponent> changes;
 
     // the watcher is created by setUp(), must be attached manually
-    private FieldWatcher _watcher;
+    private FieldWatcher watcher;
 
 
     @Override
@@ -73,34 +70,35 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText = new JTextField();
-                _fButton = new JCheckBox();
-                _fList = new JList(new String[] {"foo", "bar", "baz"});
-                _theButton = new JButton("don't press");
+                fText = new JTextField();
+                fButton = new JCheckBox();
+                fList = new JList<String>(new String[] {"foo", "bar", "baz"});
+                theButton = new JButton("don't press");
 
                 // initial values for these fields
-                _fText.setText(TEXT_INITIAL);
-                _fButton.setSelected(BUTTON_INITIAL);
-                _fList.setSelectedIndex(LIST_INITIAL_IDX);
+                fText.setText(TEXT_INITIAL);
+                fButton.setSelected(BUTTON_INITIAL);
+                fList.setSelectedIndex(LIST_INITIAL_IDX);
 
                 // we could test without creating an actual containment
                 // hierarchy, but feel it's best to keep the code close
                 // to real-world
                 JPanel content = new JPanel();
-                content.add(_fText);
-                content.add(_fButton);
-                content.add(_fList);
-                content.add(_theButton);
+                content.add(fText);
+                content.add(fButton);
+                content.add(fList);
+                content.add(theButton);
 
-                _theFrame = new JFrame(this.getClass().getName());
-                _theFrame.setContentPane(content);
-                _theFrame.pack();
+                theFrame = new JFrame(this.getClass().getName());
+                theFrame.setContentPane(content);
+                theFrame.pack();
                 // there's no need to actually display the frame, however
 
-                _watcher = new FieldWatcher(_theButton);
-                _theButton.setEnabled(false);
+                watcher = new FieldWatcher(theButton);
+                theButton.setEnabled(false);
             }
         });
     }
@@ -112,9 +110,10 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theFrame.dispose();
+                theFrame.dispose();
             }
         });
     }
@@ -126,19 +125,19 @@ extends TestCase
 
     private void recordState()
     {
-        _buttonState = _theButton.isEnabled();
-        _changes = _watcher.getChangedComponents();
+        buttonState = theButton.isEnabled();
+        changes = watcher.getChangedComponents();
     }
 
 
-    private void assertState(JComponent... changes)
+    private void assertState(JComponent... expectedChanges)
     {
-        if (changes.length > 0)
-            assertTrue(_buttonState);
+        if (expectedChanges.length > 0)
+            assertTrue(buttonState);
 
-        assertEquals(changes.length, _changes.size());
-        for (JComponent comp : changes)
-            assertTrue(_changes.contains(comp));
+        assertEquals(expectedChanges.length, changes.size());
+        for (JComponent comp : expectedChanges)
+            assertTrue(changes.contains(comp));
     }
 
 
@@ -150,9 +149,10 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _watcher.addWatchedField(_fText);
+                watcher.addWatchedField(fText);
                 recordState();
             }
         });
@@ -161,20 +161,22 @@ extends TestCase
         // first check that we track the change
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText(TEXT_UPDATED);
+                fText.setText(TEXT_UPDATED);
                 recordState();
             }
         });
-        assertState(_fText);
+        assertState(fText);
 
         // then that we track the return to initial value
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText(TEXT_INITIAL);
+                fText.setText(TEXT_INITIAL);
                 recordState();
             }
         });
@@ -186,9 +188,10 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _watcher.addWatchedField(_fButton);
+                watcher.addWatchedField(fButton);
                 recordState();
             }
         });
@@ -196,19 +199,21 @@ extends TestCase
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fButton.setSelected(BUTTON_UPDATED);
+                fButton.setSelected(BUTTON_UPDATED);
                 recordState();
             }
         });
-        assertState(_fButton);
+        assertState(fButton);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fButton.setSelected(BUTTON_INITIAL);
+                fButton.setSelected(BUTTON_INITIAL);
                 recordState();
             }
         });
@@ -220,10 +225,11 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _watcher.addWatchedField(_fList);
-                _buttonState = _theButton.isEnabled();
+                watcher.addWatchedField(fList);
+                buttonState = theButton.isEnabled();
                 recordState();
             }
         });
@@ -231,19 +237,21 @@ extends TestCase
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fList.setSelectedIndex(LIST_UPDATED_IDX);
+                fList.setSelectedIndex(LIST_UPDATED_IDX);
                 recordState();
             }
         });
-        assertState(_fList);
+        assertState(fList);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fList.setSelectedIndex(LIST_INITIAL_IDX);
+                fList.setSelectedIndex(LIST_INITIAL_IDX);
                 recordState();
             }
         });
@@ -256,11 +264,12 @@ extends TestCase
         // this first step is setup, but I'll assert anyway
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _watcher.addWatchedField(_fText)
-                        .addWatchedField(_fButton)
-                        .addWatchedField(_fList);
+                watcher.addWatchedField(fText)
+                        .addWatchedField(fButton)
+                        .addWatchedField(fList);
                 recordState();
             }
         });
@@ -269,22 +278,24 @@ extends TestCase
         // update from initial values, everything should be flagged
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText(TEXT_UPDATED);
-                _fButton.setSelected(BUTTON_UPDATED);
-                _fList.setSelectedIndex(LIST_UPDATED_IDX);
+                fText.setText(TEXT_UPDATED);
+                fButton.setSelected(BUTTON_UPDATED);
+                fList.setSelectedIndex(LIST_UPDATED_IDX);
                 recordState();
             }
         });
-        assertState(_fText, _fButton, _fList);
+        assertState(fText, fButton, fList);
 
         // reset means nothing will be flagged
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _watcher.reset();
+                watcher.reset();
                 recordState();
             }
         });
@@ -293,24 +304,26 @@ extends TestCase
         // changing back to (original) initial values should now set the flag
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText(TEXT_INITIAL);
-                _fButton.setSelected(BUTTON_INITIAL);
-                _fList.setSelectedIndex(LIST_INITIAL_IDX);
+                fText.setText(TEXT_INITIAL);
+                fButton.setSelected(BUTTON_INITIAL);
+                fList.setSelectedIndex(LIST_INITIAL_IDX);
                 recordState();
             }
         });
-        assertState(_fText, _fButton, _fList);
+        assertState(fText, fButton, fList);
 
         // and changing back to the reset values should turn it off
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText(TEXT_UPDATED);
-                _fButton.setSelected(BUTTON_UPDATED);
-                _fList.setSelectedIndex(LIST_UPDATED_IDX);
+                fText.setText(TEXT_UPDATED);
+                fButton.setSelected(BUTTON_UPDATED);
+                fList.setSelectedIndex(LIST_UPDATED_IDX);
                 recordState();
             }
         });
@@ -323,11 +336,12 @@ extends TestCase
         // setup: the field won't appear, even if it has valid initial state
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText("ab");
-                FieldValidator validator = new FieldValidator(_fText, "a*b+");
-                _watcher.addValidatedField(_fText, validator);
+                fText.setText("ab");
+                FieldValidator validator = new FieldValidator(fText, "a*b+");
+                watcher.addValidatedField(fText, validator);
                 recordState();
             }
         });
@@ -336,20 +350,22 @@ extends TestCase
         // verify that it appears when we set valid content
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText("b");
+                fText.setText("b");
                 recordState();
             }
         });
-        assertState(_fText);
+        assertState(fText);
 
         // ... disappears when we set invalid text
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText("a");
+                fText.setText("a");
                 recordState();
             }
         });
@@ -358,9 +374,10 @@ extends TestCase
         // ... and appears again when valid
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _fText.setText("ab");
+                fText.setText("ab");
                 recordState();
             }
         });

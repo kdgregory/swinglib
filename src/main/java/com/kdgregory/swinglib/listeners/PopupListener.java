@@ -40,11 +40,11 @@ extends MouseAdapter
 //  Instance Data and Constructors
 //----------------------------------------------------------------------------
 
-    private JPopupMenu _menu;
+    private JPopupMenu menu;
 
     public PopupListener(JComponent comp, JPopupMenu menu)
     {
-        _menu = menu;
+        this.menu = menu;
     }
 
 
@@ -72,7 +72,7 @@ extends MouseAdapter
     {
         if (evt.isPopupTrigger())
         {
-            _menu.show(evt.getComponent(), evt.getX(), evt.getY());
+            menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
 }

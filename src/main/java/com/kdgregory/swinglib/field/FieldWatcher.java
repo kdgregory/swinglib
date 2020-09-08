@@ -67,16 +67,11 @@ import javax.swing.text.JTextComponent;
  */
 public class FieldWatcher
 {
-    private List<AbstractWatcher<?>> _watchers
-            = new ArrayList<AbstractWatcher<?>>();
-    private Map<JComponent,FieldValidator> _validators
-            = new IdentityHashMap<JComponent,FieldValidator>();
-    private List<JComponent> _controlledComponents
-            = new ArrayList<JComponent>();
-    private List<Action> _controlledActions
-            = new ArrayList<Action>();
-    private Map<JComponent,AbstractWatcher<?>> _changed
-            = new IdentityHashMap<JComponent,AbstractWatcher<?>>();
+    private List<AbstractWatcher<?>> watchers          = new ArrayList<AbstractWatcher<?>>();
+    private Map<JComponent,FieldValidator> validators  = new IdentityHashMap<JComponent,FieldValidator>();
+    private List<JComponent> controlledComponents      = new ArrayList<JComponent>();
+    private List<Action> controlledActions             = new ArrayList<Action>();
+    private Map<JComponent,AbstractWatcher<?>> changed = new IdentityHashMap<JComponent,AbstractWatcher<?>>();
 
 
     /**
@@ -86,8 +81,9 @@ public class FieldWatcher
      */
     public FieldWatcher(JComponent... controlled)
     {
-        _controlledComponents.addAll(Arrays.asList(controlled));
+        controlledComponents.addAll(Arrays.asList(controlled));
     }
+
 
     /**
      *  Creates an instance with zero or more controlled actions. These will
@@ -96,7 +92,7 @@ public class FieldWatcher
      */
     public FieldWatcher(Action... controlled)
     {
-        _controlledActions.addAll(Arrays.asList(controlled));
+        controlledActions.addAll(Arrays.asList(controlled));
     }
 
 
@@ -106,7 +102,7 @@ public class FieldWatcher
      */
     public FieldWatcher addControlled(JComponent controlled)
     {
-        _controlledComponents.add(controlled);
+        controlledComponents.add(controlled);
         return this;
     }
 
@@ -117,7 +113,7 @@ public class FieldWatcher
      */
     public FieldWatcher addControlled(Action controlled)
     {
-        _controlledActions.add(controlled);
+        controlledActions.add(controlled);
         return this;
     }
 
@@ -130,19 +126,20 @@ public class FieldWatcher
      *  @return The watcher, allowing multiple components to be added using
      *          chained calls.
      */
+    @SuppressWarnings("rawtypes")
     public FieldWatcher addWatchedField(JComponent theField)
     {
         if (theField instanceof JTextComponent)
         {
-            _watchers.add(new TextWatcher((JTextComponent)theField));
+            watchers.add(new TextWatcher((JTextComponent)theField));
         }
         else if (theField instanceof JToggleButton)
         {
-            _watchers.add(new ToggleWatcher((JToggleButton)theField));
+            watchers.add(new ToggleWatcher((JToggleButton)theField));
         }
         else if (theField instanceof JList)
         {
-            _watchers.add(new ListWatcher((JList)theField));
+            watchers.add(new ListWatcher((JList)theField));
         }
         else
         {
@@ -159,7 +156,7 @@ public class FieldWatcher
      */
     public FieldWatcher addValidatedField(JTextComponent theField, FieldValidator validator)
     {
-        _validators.put(theField, validator);
+        validators.put(theField, validator);
         return addWatchedField(theField);
     }
 
@@ -170,7 +167,7 @@ public class FieldWatcher
      */
     public Collection<JComponent> getChangedComponents()
     {
-        return new ArrayList<JComponent>(_changed.keySet());
+        return new ArrayList<JComponent>(changed.keySet());
     }
 
 
@@ -180,10 +177,12 @@ public class FieldWatcher
      */
     public void reset()
     {
-        _changed.clear();
+        changed.clear();
         updateControlled();
-        for (AbstractWatcher<?> watcher : _watchers)
+        for (AbstractWatcher<?> watcher : watchers)
+        {
             watcher.reset();
+        }
     }
 
 
@@ -193,15 +192,15 @@ public class FieldWatcher
 
     /**
      *  Enables/disables controlled components based on whether there are
-     *  any changes. This should be called whenever the {@link #_changed}
+     *  any changes. This should be called whenever the {@link #changed}
      *  set is modified.
      */
     private void updateControlled()
     {
-        boolean enable = (_changed.size() > 0);
-        for (JComponent comp : _controlledComponents)
+        boolean enable = (changed.size() > 0);
+        for (JComponent comp : controlledComponents)
             comp.setEnabled(enable);
-        for (Action action : _controlledActions)
+        for (Action action : controlledActions)
             action.setEnabled(enable);
     }
 
@@ -212,24 +211,24 @@ public class FieldWatcher
 
     private abstract class AbstractWatcher<T extends JComponent>
     {
-        private T _component;
+        private T component;
 
         protected AbstractWatcher(T component)
         {
-            _component = component;
+            this.component = component;
         }
 
         protected T getComponent()
         {
-            return _component;
+            return component;
         }
 
         protected void markChanged(boolean hasChanged)
         {
             if (hasChanged)
-                _changed.put(_component, this);
+                changed.put(component, this);
             else
-                _changed.remove(_component);
+                changed.remove(component);
             updateControlled();
         }
 
@@ -241,8 +240,8 @@ public class FieldWatcher
     extends AbstractWatcher<JTextComponent>
     implements DocumentListener
     {
-        private int _initialLength;
-        private String _initialValue;
+        private int initialLength;
+        private String initialValue;
 
         public TextWatcher(JTextComponent theField)
         {
@@ -255,20 +254,26 @@ public class FieldWatcher
         public void reset()
         {
             Document doc = getComponent().getDocument();
-            _initialLength = doc.getLength();
-            _initialValue = getDocumentText(doc);
+            initialLength = doc.getLength();
+            initialValue = getDocumentText(doc);
         }
 
+
+        @Override
         public void changedUpdate(DocumentEvent evt)
         {
             commonHandler(evt);
         }
 
+
+        @Override
         public void insertUpdate(DocumentEvent evt)
         {
             commonHandler(evt);
         }
 
+
+        @Override
         public void removeUpdate(DocumentEvent evt)
         {
             commonHandler(evt);
@@ -280,12 +285,12 @@ public class FieldWatcher
 
             // initial length check is quick, if unchanged we need to check
             // actual content
-            boolean hasChanged = _initialLength != doc.getLength();
+            boolean hasChanged = initialLength != doc.getLength();
             if (!hasChanged)
-                hasChanged = !_initialValue.equals(getDocumentText(doc));
+                hasChanged = !initialValue.equals(getDocumentText(doc));
 
             // if there's a validator, make sure we're now valid
-            FieldValidator validator = _validators.get(getComponent());
+            FieldValidator validator = validators.get(getComponent());
             if (hasChanged && (validator != null))
                 hasChanged = validator.isValid();
 
@@ -312,7 +317,7 @@ public class FieldWatcher
     extends AbstractWatcher<JToggleButton>
     implements ChangeListener
     {
-        private boolean _initialState;
+        private boolean initialState;
 
         public ToggleWatcher(JToggleButton theButton)
         {
@@ -324,22 +329,24 @@ public class FieldWatcher
         @Override
         public void reset()
         {
-            _initialState = getComponent().isSelected();
+            initialState = getComponent().isSelected();
         }
 
+        @Override
         public void stateChanged(ChangeEvent evt)
         {
             boolean currentState = getComponent().isSelected();
-            markChanged(currentState != _initialState);
+            markChanged(currentState != initialState);
         }
     }
 
 
+    @SuppressWarnings("rawtypes")
     private class ListWatcher
     extends AbstractWatcher<JList>
     implements ListSelectionListener
     {
-        private int[] _initialSelections;
+        private int[] initialSelections;
 
         public ListWatcher(JList theList)
         {
@@ -351,13 +358,14 @@ public class FieldWatcher
         @Override
         public void reset()
         {
-            _initialSelections = getComponent().getSelectedIndices();
+            initialSelections = getComponent().getSelectedIndices();
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent evt)
         {
             int[] currentSelections = getComponent().getSelectedIndices();
-            boolean hasChanged = !Arrays.equals(currentSelections, _initialSelections);
+            boolean hasChanged = !Arrays.equals(currentSelections, initialSelections);
             markChanged(hasChanged);
         }
     }

@@ -22,20 +22,18 @@ import javax.swing.text.PlainDocument;
 
 import junit.framework.TestCase;
 
-import com.kdgregory.swinglib.field.FieldValidator;
-
 
 public class TestFieldValidator
 extends TestCase
 {
     // these objects are only updated on the event thread, but are member
     // variables so that they persist between Runnables
-    private JTextField _theField;
-    private FieldValidator _validator;
+    private JTextField theField;
+    private FieldValidator validator;
 
     // these variables are used to exchange state between event and test threads
-    private volatile boolean _isValid;
-    private volatile Color _currentColor;
+    private volatile boolean isValid;
+    private volatile Color currentColor;
 
 
 //----------------------------------------------------------------------------
@@ -46,34 +44,37 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField = new JTextField("blah");
-                _validator = new FieldValidator(_theField, "bla*h");
-                _isValid = _validator.isValid();
+                theField = new JTextField("blah");
+                validator = new FieldValidator(theField, "bla*h");
+                isValid = validator.isValid();
             }
         });
-        assertTrue(_isValid);
+        assertTrue(isValid);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField.setText("argle");
-                _isValid = _validator.isValid();
+                theField.setText("argle");
+                isValid = validator.isValid();
             }
         });
-        assertFalse(_isValid);
+        assertFalse(isValid);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField.setText("blaaaaaaaah");
-                _isValid = _validator.isValid();
+                theField.setText("blaaaaaaaah");
+                isValid = validator.isValid();
             }
         });
-        assertTrue(_isValid);
+        assertTrue(isValid);
     }
 
 
@@ -81,40 +82,43 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField = new JTextField("blah");
-                _validator = new FieldValidator(_theField, "bla*h", Color.red, Color.blue);
-                _isValid = _validator.isValid();
-                _currentColor = _theField.getBackground();
+                theField = new JTextField("blah");
+                validator = new FieldValidator(theField, "bla*h", Color.red, Color.blue);
+                isValid = validator.isValid();
+                currentColor = theField.getBackground();
             }
         });
-        assertTrue(_isValid);
-        assertEquals(Color.blue, _currentColor);
+        assertTrue(isValid);
+        assertEquals(Color.blue, currentColor);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField.setText("argle");
-                _isValid = _validator.isValid();
-                _currentColor = _theField.getBackground();
+                theField.setText("argle");
+                isValid = validator.isValid();
+                currentColor = theField.getBackground();
             }
         });
-        assertFalse(_isValid);
-        assertEquals(Color.red, _currentColor);
+        assertFalse(isValid);
+        assertEquals(Color.red, currentColor);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField.setText("blaaaaaaaah");
-                _isValid = _validator.isValid();
-                _currentColor = _theField.getBackground();
+                theField.setText("blaaaaaaaah");
+                isValid = validator.isValid();
+                currentColor = theField.getBackground();
             }
         });
-        assertTrue(_isValid);
-        assertEquals(Color.blue, _currentColor);
+        assertTrue(isValid);
+        assertEquals(Color.blue, currentColor);
     }
 
 
@@ -122,36 +126,39 @@ extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField = new JTextField("blah");
-                _validator = new FieldValidator(_theField, "bla*h");
-                _isValid = _validator.isValid();
+                theField = new JTextField("blah");
+                validator = new FieldValidator(theField, "bla*h");
+                isValid = validator.isValid();
             }
         });
-        assertTrue(_isValid);
+        assertTrue(isValid);
 
         // update the document without updating the watcher
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theField.setDocument(new PlainDocument());
-                _theField.setText("argle");
-                _isValid = _validator.isValid();
+                theField.setDocument(new PlainDocument());
+                theField.setText("argle");
+                isValid = validator.isValid();
             }
         });
-        assertTrue(_isValid);
+        assertTrue(isValid);
 
         // now reset the watcher, which should change the status
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _validator.reset();
-                _isValid = _validator.isValid();
+                validator.reset();
+                isValid = validator.isValid();
             }
         });
-        assertFalse(_isValid);
+        assertFalse(isValid);
     }
 }

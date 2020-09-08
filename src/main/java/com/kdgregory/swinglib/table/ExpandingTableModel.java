@@ -32,10 +32,10 @@ extends AbstractTableModel
 {
     private static final long serialVersionUID = 1L;
 
-    private int _colCount = 0;
-    private ArrayList<Object> _headers = new ArrayList<Object>();
-    private ArrayList<Class<?>> _classes = new ArrayList<Class<?>>();
-    private ArrayList<ArrayList<Object>> _data = new ArrayList<ArrayList<Object>>();
+    private int colCount = 0;
+    private ArrayList<Object> headers = new ArrayList<Object>();
+    private ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
+    private ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 
 
     /**
@@ -54,7 +54,7 @@ extends AbstractTableModel
      */
     public ExpandingTableModel(int rows, int cols)
     {
-        _colCount = cols;
+        colCount = cols;
         for (int ii = 0 ; ii < rows ; ii++)
         {
             addRow();
@@ -90,7 +90,7 @@ extends AbstractTableModel
         this(data);
         for (Object obj : columnNames)
         {
-            _headers.add(obj);
+            headers.add(obj);
         }
     }
 
@@ -110,7 +110,7 @@ extends AbstractTableModel
         this(data, columnNames);
         for (Class<?> klass : colClasses)
         {
-            _classes.add(klass);
+            classes.add(klass);
         }
 
         for (int row = 0 ; row < data.length ; row++)
@@ -123,7 +123,6 @@ extends AbstractTableModel
         }
     }
 
-
 //----------------------------------------------------------------------------
 //  TableModel
 //----------------------------------------------------------------------------
@@ -132,18 +131,20 @@ extends AbstractTableModel
      *  Returns the current number of columns in the model. This may be
      *  changed via {@link #setWidth}.
      */
+    @Override
     public int getColumnCount()
     {
-        return _colCount;
+        return colCount;
     }
 
 
     /**
      *  Returns the number of rows in the model, including the "phantom" row.
      */
+    @Override
     public int getRowCount()
     {
-        return _data.size() + 1;
+        return data.size() + 1;
     }
 
 
@@ -159,11 +160,11 @@ extends AbstractTableModel
     @Override
     public String getColumnName(int col)
     {
-        if (col >= _colCount)
-            throw new IndexOutOfBoundsException("attempted: " + col + ", model size: " + _colCount);
+        if (col >= colCount)
+            throw new IndexOutOfBoundsException("attempted: " + col + ", model size: " + colCount);
 
-        return (col < _headers.size())
-               ? String.valueOf(_headers.get(col))
+        return (col < headers.size())
+               ? String.valueOf(headers.get(col))
                : "";
     }
 
@@ -175,11 +176,11 @@ extends AbstractTableModel
     @Override
     public Class<?> getColumnClass(int col)
     {
-        if (col >= _colCount)
-            throw new IndexOutOfBoundsException("attempted: " + col + ", model size: " + _colCount);
+        if (col >= colCount)
+            throw new IndexOutOfBoundsException("attempted: " + col + ", model size: " + colCount);
 
-        return (col < _classes.size())
-               ? _classes.get(col)
+        return (col < classes.size())
+               ? classes.get(col)
                : Object.class;
     }
 
@@ -190,11 +191,12 @@ extends AbstractTableModel
      *
      *  @throws IndexOutOfBoundsException on attempts to get an invalid cell.
      */
+    @Override
     public Object getValueAt(int row, int col)
     {
-        return (row == _data.size())
+        return (row == data.size())
                ? null
-               : _data.get(row).get(col);
+               : data.get(row).get(col);
     }
 
 
@@ -209,12 +211,12 @@ extends AbstractTableModel
     public void setValueAt(Object value, int row, int col)
     {
         checkClass(value, getColumnClass(col), row, col);
-        if (row == _data.size())
+        if (row == data.size())
         {
             addRow();
             fireTableRowsInserted(row + 1, row + 1);
         }
-        _data.get(row).set(col, value);
+        data.get(row).set(col, value);
         fireTableCellUpdated(row, col);
     }
 
@@ -222,7 +224,7 @@ extends AbstractTableModel
     @Override
     public boolean isCellEditable(int row, int col)
     {
-        return (row <= _data.size()) && (col < _colCount);
+        return (row <= data.size()) && (col < colCount);
     }
 
 
@@ -241,11 +243,11 @@ extends AbstractTableModel
      */
     public void setWidth(int width)
     {
-        if (width == _colCount)
+        if (width == colCount)
             return;
 
-        _colCount = width;
-        for (int ii = 0 ; ii < _data.size() ; ii++)
+        colCount = width;
+        for (int ii = 0 ; ii < data.size() ; ii++)
         {
             resizeRow(ii);
         }
@@ -261,13 +263,13 @@ extends AbstractTableModel
      */
     public void setColumnName(int col, Object name)
     {
-        while (_headers.size() <= col)
+        while (headers.size() <= col)
         {
-            _headers.add("");
+            headers.add("");
         }
-        _headers.set(col, name);
+        headers.set(col, name);
 
-        if (col < _colCount)
+        if (col < colCount)
             fireTableStructureChanged();
     }
 
@@ -279,21 +281,21 @@ extends AbstractTableModel
      */
     public void setColumnClass(int col, Class<?> klass)
     {
-        if (col < _colCount)
+        if (col < colCount)
         {
-            for (int row = 0 ; row < _data.size() ; row++)
+            for (int row = 0 ; row < data.size() ; row++)
             {
                 checkClass(getValueAt(row, col), klass, row, col);
             }
         }
 
-        while (_classes.size() <= col)
+        while (classes.size() <= col)
         {
-            _classes.add(Object.class);
+            classes.add(Object.class);
         }
-        _classes.set(col, klass);
+        classes.set(col, klass);
 
-        if (col < _colCount)
+        if (col < colCount)
             fireTableStructureChanged();
     }
 
@@ -307,12 +309,12 @@ extends AbstractTableModel
      */
     private ArrayList<Object> addRow()
     {
-        ArrayList<Object> row = new ArrayList<Object>(_colCount);
-        for (int ii = 0 ; ii < _colCount ; ii++)
+        ArrayList<Object> row = new ArrayList<Object>(colCount);
+        for (int ii = 0 ; ii < colCount ; ii++)
         {
             row.add(null);
         }
-        _data.add(row);
+        data.add(row);
         return row;
     }
 
@@ -324,7 +326,7 @@ extends AbstractTableModel
      */
     private ArrayList<Object> addRow(Object[] rowData)
     {
-        setWidth(Math.max(rowData.length, _colCount));
+        setWidth(Math.max(rowData.length, colCount));
         ArrayList<Object> row = addRow();
         for (int ii = 0 ; ii < rowData.length ; ii++)
         {
@@ -340,12 +342,12 @@ extends AbstractTableModel
      */
     private ArrayList<Object> resizeRow(int ii)
     {
-        ArrayList<Object> row = _data.get(ii);
-        while (row.size() > _colCount)
+        ArrayList<Object> row = data.get(ii);
+        while (row.size() > colCount)
         {
             row.remove(row.size() - 1);
         }
-        while (row.size() < _colCount)
+        while (row.size() < colCount)
         {
             row.add(null);
         }

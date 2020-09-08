@@ -23,8 +23,6 @@ import javax.swing.table.TableModel;
 
 import junit.framework.TestCase;
 
-import com.kdgregory.swinglib.table.ExpandingTableModel;
-
 
 public class TestExpandingTableModel extends TestCase
 {
@@ -136,6 +134,7 @@ public class TestExpandingTableModel extends TestCase
     {
         public List<TableModelEvent> events = new ArrayList<TableModelEvent>();
 
+        @Override
         public void tableChanged(TableModelEvent e)
         {
             events.add(e);

@@ -37,8 +37,8 @@ extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
 
-    private JDialog _dialog;
-    private boolean _dispose;
+    private JDialog dialog;
+    private boolean dispose;
 
 
     /**
@@ -56,8 +56,8 @@ extends AbstractAction
     public DialogCloseAction(JDialog dialog, String name, boolean dispose)
     {
         super(name);
-        _dialog = dialog;
-        _dispose = dispose;
+        this.dialog = dialog;
+        this.dispose = dispose;
     }
 
 
@@ -68,15 +68,16 @@ extends AbstractAction
      */
     public void setDialog(JDialog dialog)
     {
-        _dialog = dialog;
+        this.dialog = dialog;
     }
 
 
+    @Override
     public void actionPerformed(ActionEvent ignored)
     {
-        if (_dispose)
-            _dialog.dispose();
+        if (dispose)
+            dialog.dispose();
         else
-            _dialog.setVisible(false);
+            dialog.setVisible(false);
     }
 }

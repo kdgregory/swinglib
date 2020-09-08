@@ -50,11 +50,7 @@ import java.awt.LayoutManager2;
  *       way to override for all components, since forms typically use a left/
  *       center alignment.
  *  </UL>
- ******************************************************************************
- * @version    1.0
- * @copyright  2004, Keith D. Gregory
- * @cvs        {$Id: CompactGridLayout.java,v 1.3 2009-04-11 16:44:37 kgregory Exp $}
- **/
+ */
 
 public class CompactGridLayout
 implements LayoutManager2
@@ -63,24 +59,24 @@ implements LayoutManager2
 //  Instance data and constructors
 //----------------------------------------------------------------------------
 
-    private int     _cols;                  // # columns, set by ctor
-    private int     _rows;                  // # rows, set by recalculate()
+    private int     cols;                  // # columns, set by ctor
+    private int     rows;                  // # rows, set by recalculate()
 
-    private int     _vGap;                  // gap between rows
-    private int     _hGap;                  // gap between cols
+    private int     vGap;                  // gap between rows
+    private int     hGap;                  // gap between cols
 
-    private float   _xAlignment;            // horizontal alignment within cell
-    private float   _yAlignment;            // vertical alignment within cell
+    private float   xAlignment;            // horizontal alignment within cell
+    private float   yAlignment;            // vertical alignment within cell
 
-    private int[]   _minRowHeights;         // minimum height of each row
-    private int[]   _prfRowHeights;         // preferred height of each row
-    private int[]   _minColWidths;          // minimum width of each column
-    private int[]   _prfColWidths;          // preferred width of each column
+    private int[]   minRowHeights;         // minimum height of each row
+    private int[]   prfRowHeights;         // preferred height of each row
+    private int[]   minColWidths;          // minimum width of each column
+    private int[]   prfColWidths;          // preferred width of each column
 
-    private int     _preferredHeight;       // these four include container insets
-    private int     _preferredWidth;
-    private int     _minimumHeight;
-    private int     _minimumWidth;
+    private int     preferredHeight;       // these four include container insets
+    private int     preferredWidth;
+    private int     minimumHeight;
+    private int     minimumWidth;
 
 
     /** Basic constructor, which allows user to specify the number of columns
@@ -120,11 +116,11 @@ implements LayoutManager2
      */
     public CompactGridLayout( int cols, int hGap, int vGap, float hAlign, float vAlign )
     {
-        _cols = cols;
-        _hGap = hGap;
-        _vGap = vGap;
-        _xAlignment = hAlign;
-        _yAlignment = vAlign;
+        this.cols = cols;
+        this.hGap = hGap;
+        this.vGap = vGap;
+        this.xAlignment = hAlign;
+        this.yAlignment = vAlign;
     }
 
 
@@ -132,7 +128,8 @@ implements LayoutManager2
 //  Public methods
 //----------------------------------------------------------------------------
 
-    /** Adds a component to the layout, associating it with the specified
+    /**
+     *  Adds a component to the layout, associating it with the specified
      *  constraints object.
      *
      *  @param  comp    The component to add.
@@ -140,6 +137,7 @@ implements LayoutManager2
      *                  this layout manager does not use constraints, this
      *                  parameter is ignored, and may be <CODE>null</CODE>
      */
+    @Override
     public void addLayoutComponent( Component comp, Object cons )
     {
         // in this revision, we don't keep track of constraints, so don't
@@ -147,7 +145,8 @@ implements LayoutManager2
     }
 
 
-    /** Adds a component to the layout, associating it with the specified
+    /**
+     *  Adds a component to the layout, associating it with the specified
      *  constraints object.
      *
      *  @deprecated     use <CODE>addLayoutComponent(Component,Object)</CODE>
@@ -157,13 +156,19 @@ implements LayoutManager2
      *                  this layout manager does not use constraints, this
      *                  parameter is ignored, and may be <CODE>null</CODE>
      */
+    @Override
+    @Deprecated
     public void addLayoutComponent( String name, Component comp )
     {
+        // in this revision, we don't keep track of constraints, so don't
+        // need to do anything in this method
     }
 
 
-    /** Removes a component from the layout.
+    /**
+     *  Removes a component from the layout.
      */
+    @Override
     public void removeLayoutComponent(Component comp)
     {
         // we don't need to do anything since we just get the list of
@@ -171,56 +176,66 @@ implements LayoutManager2
     }
 
 
-    /** Invalidates the current cached information for this layout, and
+    /**
+     *  Invalidates the current cached information for this layout, and
      *  recalculates the row heights and column widths.
      */
+    @Override
     public void invalidateLayout(Container target)
     {
         synchronized (target.getTreeLock())
         {
-            _minRowHeights = null;
-            _prfRowHeights = null;
-            _minColWidths  = null;
-            _prfColWidths  = null;
+            minRowHeights = null;
+            prfRowHeights = null;
+            minColWidths  = null;
+            prfColWidths  = null;
         }
     }
 
 
-    /** Returns the preferred size of this layout, based on its components.
+    /**
+     *  Returns the preferred size of this layout, based on its components.
      */
+    @Override
     public Dimension preferredLayoutSize(Container target)
     {
         synchronized (target.getTreeLock())
         {
             recalculate(target);
-            return new Dimension(_preferredWidth, _preferredHeight);
+            return new Dimension(preferredWidth, preferredHeight);
         }
     }
 
 
-    /** Returns the minimum size of this layout, based on its components.
+    /**
+     *  Returns the minimum size of this layout, based on its components.
      */
+    @Override
     public Dimension minimumLayoutSize(Container target)
     {
         synchronized (target.getTreeLock())
         {
             recalculate(target);
-            return new Dimension(_minimumWidth, _minimumHeight);
+            return new Dimension(minimumWidth, minimumHeight);
         }
     }
 
 
-    /** Returns the maximum size of this layout, which is the same as its
+    /**
+     *  Returns the maximum size of this layout, which is the same as its
      *  preferred size.
      */
+    @Override
     public Dimension maximumLayoutSize(Container target)
     {
         return preferredLayoutSize(target);
     }
 
 
-    /** Lays out the container.
+    /**
+     *  Lays out the container.
      */
+    @Override
     public void layoutContainer(Container target)
     {
         synchronized (target.getTreeLock())
@@ -242,20 +257,17 @@ implements LayoutManager2
 
                 int colWidth = calculateColWidth(col);
 
-                int xOffset = (int)((colWidth - compWidth) * _xAlignment);
-                int yOffset = (int)((rowHeight - compHeight) * _yAlignment);
-
                 comp.setBounds(x, y, compWidth, compHeight);
 
-                x += colWidth + _hGap;;
+                x += colWidth + hGap;
 
-                if (++col == _cols)
+                if (++col == cols)
                 {
                     col = 0;
                     row++;
                     x = target.getInsets().left;
-                    y += rowHeight + _vGap;
-                    if (row < _rows)
+                    y += rowHeight + vGap;
+                    if (row < rows)
                         rowHeight = calculateRowHeight(row);
                 }
             }
@@ -263,16 +275,20 @@ implements LayoutManager2
     }
 
 
-    /** Returns a default horizontal alignment value for this container.
+    /**
+     *  Returns a default horizontal alignment value for this container.
      */
+    @Override
     public float getLayoutAlignmentX(Container target)
     {
         return 0.0f;
     }
 
 
-    /** Returns a default vertical alignment value for this container.
+    /**
+     *  Returns a default vertical alignment value for this container.
      */
+    @Override
     public float getLayoutAlignmentY(Container target)
     {
         return 0.0f;
@@ -283,66 +299,67 @@ implements LayoutManager2
 //  Internal methods
 //----------------------------------------------------------------------------
 
-    /** Recalculates the row heights and column widths for this layout, based
+    /**
+     *  Recalculates the row heights and column widths for this layout, based
      *  on the current components. This information is cached, and this method
      *  doesn't actually do the calculation unless the cache is invalid.
      */
     private void recalculate( Container target )
     {
-        if (_minRowHeights != null)
+        if (minRowHeights != null)
             return;
 
         Component[] comps = target.getComponents();
 
-        int _rows = (comps.length / _cols)
-                  + (((comps.length % _cols) == 0) ? 0 : 1);
+        int _rows = (comps.length / cols)
+                  + (((comps.length % cols) == 0) ? 0 : 1);
 
-        _minRowHeights   = new int[_rows];
-        _prfRowHeights   = new int[_rows];
-        _minColWidths    = new int[_cols];
-        _prfColWidths    = new int[_cols];
+        minRowHeights   = new int[_rows];
+        prfRowHeights   = new int[_rows];
+        minColWidths    = new int[cols];
+        prfColWidths    = new int[cols];
 
         int row = 0;
         int col = 0;
         for (int ii = 0 ; ii < comps.length ; ii++)
         {
-            _minRowHeights[row] = Math.max(_minRowHeights[row],
+            minRowHeights[row] = Math.max(minRowHeights[row],
                                            comps[ii].getMinimumSize().height);
-            _minColWidths[col]  = Math.max(_minColWidths[col],
+            minColWidths[col]  = Math.max(minColWidths[col],
                                            comps[ii].getMinimumSize().width);
-            _prfRowHeights[row] = Math.max(_prfRowHeights[row],
+            prfRowHeights[row] = Math.max(prfRowHeights[row],
                                            comps[ii].getPreferredSize().height);
-            _prfColWidths[col]  = Math.max(_prfColWidths[col],
+            prfColWidths[col]  = Math.max(prfColWidths[col],
                                            comps[ii].getPreferredSize().width);
 
-            if (++col == _cols)
+            if (++col == cols)
             {
                 col = 0;
                 row++;
             }
         }
 
-        _minimumHeight = _preferredHeight
+        minimumHeight = preferredHeight
                        = target.getInsets().top + target.getInsets().bottom;
-        _minimumWidth  = _preferredWidth
+        minimumWidth  = preferredWidth
                        = target.getInsets().left + target.getInsets().right;
 
         for (row = 0 ; row < _rows ; row++)
         {
-            _preferredHeight += _prfRowHeights[row];
-            _minimumHeight += _minRowHeights[row];
+            preferredHeight += prfRowHeights[row];
+            minimumHeight += minRowHeights[row];
         }
 
-        for (col = 0 ; col < _cols ; col++)
+        for (col = 0 ; col < cols ; col++)
         {
-            _preferredWidth += _prfColWidths[col];
-            _minimumWidth += _minColWidths[col];
+            preferredWidth += prfColWidths[col];
+            minimumWidth += minColWidths[col];
         }
 
-        _preferredHeight += (_rows - 1) * _vGap;
-        _preferredWidth  += (_cols - 1) * _hGap;
-        _minimumHeight   += (_rows - 1) * _vGap;
-        _minimumWidth    += (_cols - 1) * _hGap;
+        preferredHeight += (_rows - 1) * vGap;
+        preferredWidth  += (cols - 1) * hGap;
+        minimumHeight   += (_rows - 1) * vGap;
+        minimumWidth    += (cols - 1) * hGap;
     }
 
 
@@ -352,7 +369,7 @@ implements LayoutManager2
      */
     private int calculateRowHeight( int row )
     {
-        return _prfRowHeights[row];
+        return prfRowHeights[row];
     }
 
 
@@ -362,6 +379,6 @@ implements LayoutManager2
      */
     private int calculateColWidth( int col )
     {
-        return _prfColWidths[col];
+        return prfColWidths[col];
     }
 }

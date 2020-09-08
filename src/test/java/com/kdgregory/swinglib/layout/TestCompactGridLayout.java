@@ -16,8 +16,6 @@ package com.kdgregory.swinglib.layout;
 
 import junit.framework.*;
 
-import com.kdgregory.swinglib.layout.CompactGridLayout;
-
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import javax.swing.JFrame;
@@ -58,9 +56,9 @@ public class TestCompactGridLayout extends TestCase
 //  Common test code
 //------------------------------------------------------------------------------
 
-    private JFrame      _frame;
-    private JPanel      _panel;
-    private JLabel[]    _labels = new JLabel[]
+    private JFrame      frame;
+    private JPanel      panel;
+    private JLabel[]    labels = new JLabel[]
                         {
                             new JLabel("ABC"),
                             new JLabel("D"),
@@ -74,10 +72,10 @@ public class TestCompactGridLayout extends TestCase
     // these are filled on the event thread after layout ... in particular, the
     // label dimensions are created with the actual runtime labels, allowing a
     // test to swap out the "standard" set defined above
-    private Rectangle   _panelBounds;
-    private Rectangle[] _labelBounds;
-    private Dimension[] _labelMinSizes;
-    private Dimension[] _labelPrfSizes;
+    private Rectangle   panelBounds;
+    private Rectangle[] labelBounds;
+    private Dimension[] labelMinSizes;
+    private Dimension[] labelPrfSizes;
 
 
     /**
@@ -88,30 +86,31 @@ public class TestCompactGridLayout extends TestCase
     public void createFrameAndRecordSizes()
     throws Exception
     {
-        _frame = new JFrame("TestCompactGridLayout");
-        _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame = new JFrame("TestCompactGridLayout");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        for (int ii = 0 ; ii < _labels.length ; ii++)
-            _panel.add(_labels[ii]);
-        _frame.setContentPane(_panel);
+        for (int ii = 0 ; ii < labels.length ; ii++)
+            panel.add(labels[ii]);
+        frame.setContentPane(panel);
 
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _frame.pack();
-                _frame.setVisible(true);
+                frame.pack();
+                frame.setVisible(true);
 
-                _panelBounds = _panel.getBounds();
+                panelBounds = panel.getBounds();
 
-                _labelBounds   = new Rectangle[_labels.length];
-                _labelMinSizes = new Dimension[_labels.length];
-                _labelPrfSizes = new Dimension[_labels.length];
-                for (int ii = 0 ; ii < _labels.length ; ii++)
+                labelBounds   = new Rectangle[labels.length];
+                labelMinSizes = new Dimension[labels.length];
+                labelPrfSizes = new Dimension[labels.length];
+                for (int ii = 0 ; ii < labels.length ; ii++)
                 {
-                    _labelBounds[ii] = _labels[ii].getBounds();
-                    _labelMinSizes[ii] = _labels[ii].getMinimumSize();
-                    _labelPrfSizes[ii] = _labels[ii].getPreferredSize();
+                    labelBounds[ii] = labels[ii].getBounds();
+                    labelMinSizes[ii] = labels[ii].getMinimumSize();
+                    labelPrfSizes[ii] = labels[ii].getPreferredSize();
                 }
             }
         });
@@ -127,9 +126,10 @@ public class TestCompactGridLayout extends TestCase
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
-                _frame.dispose();
+                frame.dispose();
             }
         });
     }
@@ -150,30 +150,30 @@ public class TestCompactGridLayout extends TestCase
     public void test1x7()
     throws Exception
     {
-        _panel = new JPanel(new CompactGridLayout(1));
+        panel = new JPanel(new CompactGridLayout(1));
         createFrameAndRecordSizes();
 
         int expectedX = 0;
         int expectedY = 0;
 
-        assertEquals("label0", expectedX, _labelBounds[0].x);
-        assertEquals("label0", expectedY, _labelBounds[0].y);
-        assertEquals("label0", _labelPrfSizes[0].width, _labelBounds[0].width);
-        assertEquals("label0", _labelPrfSizes[0].height, _labelBounds[0].height);
+        assertEquals("label0", expectedX, labelBounds[0].x);
+        assertEquals("label0", expectedY, labelBounds[0].y);
+        assertEquals("label0", labelPrfSizes[0].width, labelBounds[0].width);
+        assertEquals("label0", labelPrfSizes[0].height, labelBounds[0].height);
 
-        expectedY += _labelBounds[0].height;
+        expectedY += labelBounds[0].height;
 
-        assertEquals("label1", expectedX, _labelBounds[1].x);
-        assertEquals("label1", expectedY, _labelBounds[1].y);
-        assertEquals("label1", _labelPrfSizes[1].width, _labelBounds[1].width);
-        assertEquals("label1", _labelPrfSizes[1].height, _labelBounds[1].height);
+        assertEquals("label1", expectedX, labelBounds[1].x);
+        assertEquals("label1", expectedY, labelBounds[1].y);
+        assertEquals("label1", labelPrfSizes[1].width, labelBounds[1].width);
+        assertEquals("label1", labelPrfSizes[1].height, labelBounds[1].height);
 
-        expectedY += _labelBounds[1].height;
+        expectedY += labelBounds[1].height;
 
-        assertEquals("label2", expectedX, _labelBounds[2].x);
-        assertEquals("label2", expectedY, _labelBounds[2].y);
-        assertEquals("label2", _labelPrfSizes[2].width, _labelBounds[2].width);
-        assertEquals("label2", _labelPrfSizes[2].height, _labelBounds[2].height);
+        assertEquals("label2", expectedX, labelBounds[2].x);
+        assertEquals("label2", expectedY, labelBounds[2].y);
+        assertEquals("label2", labelPrfSizes[2].width, labelBounds[2].width);
+        assertEquals("label2", labelPrfSizes[2].height, labelBounds[2].height);
     }
 
 
@@ -185,67 +185,67 @@ public class TestCompactGridLayout extends TestCase
     public void test2x4()
     throws Exception
     {
-        _panel = new JPanel(new CompactGridLayout(2));
+        panel = new JPanel(new CompactGridLayout(2));
         createFrameAndRecordSizes();
 
-        int row0Height = Math.max(_labelPrfSizes[0].height,
-                                  _labelPrfSizes[1].height);
-        int row1Height = Math.max(_labelPrfSizes[2].height,
-                                  _labelPrfSizes[3].height);
-        int row2Height = Math.max(_labelPrfSizes[4].height,
-                                  _labelPrfSizes[5].height);
-        int row3Height = _labelPrfSizes[6].height;
+        int row0Height = Math.max(labelPrfSizes[0].height,
+                                  labelPrfSizes[1].height);
+        int row1Height = Math.max(labelPrfSizes[2].height,
+                                  labelPrfSizes[3].height);
+        int row2Height = Math.max(labelPrfSizes[4].height,
+                                  labelPrfSizes[5].height);
+        int row3Height = labelPrfSizes[6].height;
 
-        int col0Width  = Math.max(_labelPrfSizes[0].width,
-                         Math.max(_labelPrfSizes[2].width,
-                         Math.max(_labelPrfSizes[4].width,
-                                  _labelPrfSizes[6].width)));
-        int col1Width  = Math.max(_labelPrfSizes[1].width,
-                         Math.max(_labelPrfSizes[3].width,
-                                  _labelPrfSizes[5].width));
+        int col0Width  = Math.max(labelPrfSizes[0].width,
+                         Math.max(labelPrfSizes[2].width,
+                         Math.max(labelPrfSizes[4].width,
+                                  labelPrfSizes[6].width)));
+        int col1Width  = Math.max(labelPrfSizes[1].width,
+                         Math.max(labelPrfSizes[3].width,
+                                  labelPrfSizes[5].width));
 
         assertEquals("panel", (col0Width + col1Width),
-                              _panelBounds.width);
+                              panelBounds.width);
         assertEquals("panel", (row0Height + row1Height + row2Height + row3Height),
-                              _panelBounds.height);
+                              panelBounds.height);
 
         int expectedX = 0;
         int expectedY = 0;
 
-        assertEquals("label0", expectedX, _labelBounds[0].x);
-        assertEquals("label0", expectedY, _labelBounds[0].y);
-        assertEquals("label0", _labelPrfSizes[0].width, _labelBounds[0].width);
-        assertEquals("label0", _labelPrfSizes[0].height, _labelBounds[0].height);
+        assertEquals("label0", expectedX, labelBounds[0].x);
+        assertEquals("label0", expectedY, labelBounds[0].y);
+        assertEquals("label0", labelPrfSizes[0].width, labelBounds[0].width);
+        assertEquals("label0", labelPrfSizes[0].height, labelBounds[0].height);
 
         expectedX += col0Width;
 
-        assertEquals("label1", expectedX, _labelBounds[1].x);
-        assertEquals("label1", expectedY, _labelBounds[1].y);
-        assertEquals("label1", _labelPrfSizes[1].width, _labelBounds[1].width);
-        assertEquals("label1", _labelPrfSizes[1].height, _labelBounds[1].height);
+        assertEquals("label1", expectedX, labelBounds[1].x);
+        assertEquals("label1", expectedY, labelBounds[1].y);
+        assertEquals("label1", labelPrfSizes[1].width, labelBounds[1].width);
+        assertEquals("label1", labelPrfSizes[1].height, labelBounds[1].height);
 
         expectedX = 0;
         expectedY += row1Height;
 
-        assertEquals("label2", expectedX, _labelBounds[2].x);
-        assertEquals("label2", expectedY, _labelBounds[2].y);
-        assertEquals("label2", _labelPrfSizes[2].width, _labelBounds[2].width);
-        assertEquals("label2", _labelPrfSizes[2].height, _labelBounds[2].height);
+        assertEquals("label2", expectedX, labelBounds[2].x);
+        assertEquals("label2", expectedY, labelBounds[2].y);
+        assertEquals("label2", labelPrfSizes[2].width, labelBounds[2].width);
+        assertEquals("label2", labelPrfSizes[2].height, labelBounds[2].height);
 
         expectedX += col0Width;
 
-        assertEquals("label3", expectedX, _labelBounds[3].x);
-        assertEquals("label3", expectedY, _labelBounds[3].y);
-        assertEquals("label3", _labelPrfSizes[3].width, _labelBounds[3].width);
-        assertEquals("label3", _labelPrfSizes[3].height, _labelBounds[3].height);
+        assertEquals("label3", expectedX, labelBounds[3].x);
+        assertEquals("label3", expectedY, labelBounds[3].y);
+        assertEquals("label3", labelPrfSizes[3].width, labelBounds[3].width);
+        assertEquals("label3", labelPrfSizes[3].height, labelBounds[3].height);
 
         expectedX = 0;
         expectedY += row2Height;
 
-        assertEquals("label4", expectedX, _labelBounds[4].x);
-        assertEquals("label4", expectedY, _labelBounds[4].y);
-        assertEquals("label4", _labelPrfSizes[4].width, _labelBounds[4].width);
-        assertEquals("label4", _labelPrfSizes[4].height, _labelBounds[4].height);
+        assertEquals("label4", expectedX, labelBounds[4].x);
+        assertEquals("label4", expectedY, labelBounds[4].y);
+        assertEquals("label4", labelPrfSizes[4].width, labelBounds[4].width);
+        assertEquals("label4", labelPrfSizes[4].height, labelBounds[4].height);
     }
 
 
@@ -263,78 +263,78 @@ public class TestCompactGridLayout extends TestCase
         final int bottom = 21;
         final int right = 17;
 
-        _panel = new JPanel(new CompactGridLayout(3, hGap, vGap));
-        _panel.setBorder(new EmptyBorder(top, left, bottom, right));
+        panel = new JPanel(new CompactGridLayout(3, hGap, vGap));
+        panel.setBorder(new EmptyBorder(top, left, bottom, right));
 
         createFrameAndRecordSizes();
 
-        int row0Height = Math.max(_labelPrfSizes[0].height,
-                         Math.max(_labelPrfSizes[1].height,
-                                  _labelPrfSizes[2].height));
-        int row1Height = Math.max(_labelPrfSizes[3].height,
-                         Math.max(_labelPrfSizes[4].height,
-                                  _labelPrfSizes[5].height));
-        int row2Height = _labelPrfSizes[6].height;
-        int col0Width  = Math.max(_labelPrfSizes[0].width,
-                         Math.max(_labelPrfSizes[3].width,
-                                  _labelPrfSizes[6].width));
-        int col1Width  = Math.max(_labelPrfSizes[1].width,
-                                  _labelPrfSizes[4].width);
-        int col2Width  = Math.max(_labelPrfSizes[2].width,
-                                  _labelPrfSizes[5].width);
+        int row0Height = Math.max(labelPrfSizes[0].height,
+                         Math.max(labelPrfSizes[1].height,
+                                  labelPrfSizes[2].height));
+        int row1Height = Math.max(labelPrfSizes[3].height,
+                         Math.max(labelPrfSizes[4].height,
+                                  labelPrfSizes[5].height));
+        int row2Height = labelPrfSizes[6].height;
+        int col0Width  = Math.max(labelPrfSizes[0].width,
+                         Math.max(labelPrfSizes[3].width,
+                                  labelPrfSizes[6].width));
+        int col1Width  = Math.max(labelPrfSizes[1].width,
+                                  labelPrfSizes[4].width);
+        int col2Width  = Math.max(labelPrfSizes[2].width,
+                                  labelPrfSizes[5].width);
 
         assertEquals("panel", (left + right
                                     + col0Width + col1Width + col2Width
                                     + 2 * hGap),
-                              _panelBounds.width);
+                              panelBounds.width);
         assertEquals("panel", (top + bottom
                                    + row0Height + row1Height + row2Height
                                    + 2 * vGap),
-                              _panelBounds.height);
+                              panelBounds.height);
 
         int expectedX = left;
         int expectedY = top;
 
-        assertEquals("label0", expectedX, _labelBounds[0].x);
-        assertEquals("label0", expectedY, _labelBounds[0].y);
-        assertEquals("label0", _labelPrfSizes[0].width, _labelBounds[0].width);
-        assertEquals("label0", _labelPrfSizes[0].height, _labelBounds[0].height);
+        assertEquals("label0", expectedX, labelBounds[0].x);
+        assertEquals("label0", expectedY, labelBounds[0].y);
+        assertEquals("label0", labelPrfSizes[0].width, labelBounds[0].width);
+        assertEquals("label0", labelPrfSizes[0].height, labelBounds[0].height);
 
         expectedX += col0Width + hGap;
 
-        assertEquals("label1", expectedX, _labelBounds[1].x);
-        assertEquals("label1", expectedY, _labelBounds[1].y);
-        assertEquals("label1", _labelPrfSizes[1].width, _labelBounds[1].width);
-        assertEquals("label1", _labelPrfSizes[1].height, _labelBounds[1].height);
+        assertEquals("label1", expectedX, labelBounds[1].x);
+        assertEquals("label1", expectedY, labelBounds[1].y);
+        assertEquals("label1", labelPrfSizes[1].width, labelBounds[1].width);
+        assertEquals("label1", labelPrfSizes[1].height, labelBounds[1].height);
 
         expectedX += col1Width + hGap;
 
-        assertEquals("label2", expectedX, _labelBounds[2].x);
-        assertEquals("label2", expectedY, _labelBounds[2].y);
-        assertEquals("label2", _labelPrfSizes[2].width, _labelBounds[2].width);
-        assertEquals("label2", _labelPrfSizes[2].height, _labelBounds[2].height);
+        assertEquals("label2", expectedX, labelBounds[2].x);
+        assertEquals("label2", expectedY, labelBounds[2].y);
+        assertEquals("label2", labelPrfSizes[2].width, labelBounds[2].width);
+        assertEquals("label2", labelPrfSizes[2].height, labelBounds[2].height);
 
         expectedX = left;
         expectedY += row0Height + vGap;
 
-        assertEquals("label3", expectedX, _labelBounds[3].x);
-        assertEquals("label3", expectedY, _labelBounds[3].y);
-        assertEquals("label3", _labelPrfSizes[3].width, _labelBounds[3].width);
-        assertEquals("label3", _labelPrfSizes[3].height, _labelBounds[3].height);
+        assertEquals("label3", expectedX, labelBounds[3].x);
+        assertEquals("label3", expectedY, labelBounds[3].y);
+        assertEquals("label3", labelPrfSizes[3].width, labelBounds[3].width);
+        assertEquals("label3", labelPrfSizes[3].height, labelBounds[3].height);
 
         expectedX += col0Width + hGap;
 
-        assertEquals("label4", expectedX, _labelBounds[4].x);
-        assertEquals("label4", expectedY, _labelBounds[4].y);
-        assertEquals("label4", _labelPrfSizes[4].width, _labelBounds[4].width);
-        assertEquals("label4", _labelPrfSizes[4].height, _labelBounds[4].height);
+        assertEquals("label4", expectedX, labelBounds[4].x);
+        assertEquals("label4", expectedY, labelBounds[4].y);
+        assertEquals("label4", labelPrfSizes[4].width, labelBounds[4].width);
+        assertEquals("label4", labelPrfSizes[4].height, labelBounds[4].height);
 
         expectedX = left;
         expectedY += row1Height + vGap;
 
-        assertEquals("label6", expectedX, _labelBounds[6].x);
-        assertEquals("label6", expectedY, _labelBounds[6].y);
-        assertEquals("label6", _labelPrfSizes[6].width, _labelBounds[6].width);
-        assertEquals("label6", _labelPrfSizes[6].height, _labelBounds[6].height);
+        assertEquals("label6", expectedX, labelBounds[6].x);
+        assertEquals("label6", expectedY, labelBounds[6].y);
+        assertEquals("label6", labelPrfSizes[6].width, labelBounds[6].width);
+        assertEquals("label6", labelPrfSizes[6].height, labelBounds[6].height);
     }
 }

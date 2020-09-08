@@ -91,19 +91,19 @@ public class ProgressMonitor
 //  Instance Data and Constructors
 //----------------------------------------------------------------------------
 
-    private JFrame _owner;
-    private String _title;
-    private String _text;
-    private Action _action;
-    private EnumSet<Options> _options = EnumSet.noneOf(Options.class);
+    private JFrame owner;
+    private String title;
+    private String text;
+    private Action action;
+    private EnumSet<Options> options = EnumSet.noneOf(Options.class);
 
-    private JDialog _theDialog;
-    private JProgressBar _fProgress;
-    private JLabel _fStatus;
+    private JDialog theDialog;
+    private JProgressBar fProgress;
+    private JLabel fStatus;
 
-    private volatile Integer _min;
-    private volatile Integer _max;
-    private volatile Integer _cur;
+    private volatile Integer min;
+    private volatile Integer max;
+    private volatile Integer cur;
 
 
 
@@ -129,13 +129,13 @@ public class ProgressMonitor
     public ProgressMonitor(JFrame owner, String title, String text,
                                     Action action, Options... options)
     {
-        _owner = owner;
-        _title = (title != null) ? title : "";
-        _text = text;
-        _action = action;
+        this.owner = owner;
+        this.title = (title != null) ? title : "";
+        this.text = text;
+        this.action = action;
 
         for (Options option : options)
-            _options.add(option);
+            this.options.add(option);
     }
 
 
@@ -175,12 +175,15 @@ public class ProgressMonitor
     {
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
-                if (_theDialog == null)
+                if (theDialog == null)
+                {
                     constructDialog();
+                }
                 internalSetProgress();
-                SwingUtil.centerAndShow(_theDialog, _owner);
+                SwingUtil.centerAndShow(theDialog, owner);
             }
         });
         return this;
@@ -195,9 +198,10 @@ public class ProgressMonitor
     {
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theDialog.setVisible(false);
+                theDialog.setVisible(false);
                 reset();
             }
         });
@@ -212,10 +216,11 @@ public class ProgressMonitor
     {
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
-                _theDialog.dispose();
-                _theDialog = null;
+                theDialog.dispose();
+                theDialog = null;
                 reset();
             }
         });
@@ -237,16 +242,17 @@ public class ProgressMonitor
      */
     public void setProgress(int min, int current, int max)
     {
-        _min = Integer.valueOf(min);
-        _max = Integer.valueOf(max);
-        _cur = Integer.valueOf(current);
+        this.min = Integer.valueOf(min);
+        this.max = Integer.valueOf(max);
+        this.cur = Integer.valueOf(current);
 
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 // bozo check
-                if (_fProgress == null)
+                if (fProgress == null)
                     return;
 
                 internalSetProgress();
@@ -262,13 +268,14 @@ public class ProgressMonitor
     {
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 // bozo check
-                if (_fStatus == null)
+                if (fStatus == null)
                     return;
 
-                _fStatus.setText(message);
+                fStatus.setText(message);
             }
         });
     }
@@ -284,10 +291,11 @@ public class ProgressMonitor
     {
         SwingUtilities.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 // bozo check
-                if (_fProgress == null)
+                if (fProgress == null)
                     return;
 
                 reset();
@@ -306,12 +314,12 @@ public class ProgressMonitor
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        if (_text != null)
+        if (text != null)
         {
-            JLabel text = new JLabel(_text);
+            JLabel label = new JLabel(text);
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 12, 0));
-            panel.add(text);
+            panel.add(label);
             contentPane.add(panel, BorderLayout.NORTH);
         }
 
@@ -319,61 +327,63 @@ public class ProgressMonitor
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         contentPane.add(centerPanel, BorderLayout.CENTER);
 
-        if (!_options.contains(Options.NO_PROGRESS_BAR))
+        if (!options.contains(Options.NO_PROGRESS_BAR))
         {
-            _fProgress = new JProgressBar();
-            _fProgress.setMinimumSize(new Dimension(150, 30));
-            _fProgress.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-            centerPanel.add(_fProgress);
+            fProgress = new JProgressBar();
+            fProgress.setMinimumSize(new Dimension(150, 30));
+            fProgress.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            centerPanel.add(fProgress);
         }
 
-        if (_options.contains(Options.SHOW_STATUS))
+        if (options.contains(Options.SHOW_STATUS))
         {
-            _fStatus = new JLabel();
-            _fStatus.setPreferredSize(new Dimension(300, 36));
-            _fStatus.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            fStatus = new JLabel();
+            fStatus.setPreferredSize(new Dimension(300, 36));
+            fStatus.setAlignmentX(JComponent.CENTER_ALIGNMENT);
             centerPanel.add(Box.createVerticalStrut(8));
-            centerPanel.add(_fStatus);
+            centerPanel.add(fStatus);
         }
 
-        if (_action != null)
+        if (action != null)
         {
-            JButton button = new JButton(_action);
+            JButton button = new JButton(action);
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             panel.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
             panel.add(button);
             contentPane.add(panel, BorderLayout.SOUTH);
         }
 
-        _theDialog = new JDialog(_owner, _title, _options.contains(Options.MODAL));
-        _theDialog.setContentPane(contentPane);
-        _theDialog.pack();
+        theDialog = new JDialog(owner, title, options.contains(Options.MODAL));
+        theDialog.setContentPane(contentPane);
+        theDialog.pack();
     }
 
 
     private void reset()
     {
-        _min = null;
-        _max = null;
-        _cur = null;
+        min = null;
+        max = null;
+        cur = null;
     }
 
 
     private void internalSetProgress()
     {
-        if ((_min == null) || (_max == null))
+        if ((min == null) || (max == null))
         {
-            _fProgress.setIndeterminate(true);
-            _fProgress.setStringPainted(false);
+            fProgress.setIndeterminate(true);
+            fProgress.setStringPainted(false);
         }
         else
         {
-            _fProgress.setIndeterminate(false);
-            _fProgress.setStringPainted(_options.contains(Options.SHOW_PERCENT_COMPLETE));
-            _fProgress.setMinimum(_min.intValue());
-            _fProgress.setMaximum(_max.intValue());
-            if (_cur != null)
-                _fProgress.setValue(_cur.intValue());
+            fProgress.setIndeterminate(false);
+            fProgress.setStringPainted(options.contains(Options.SHOW_PERCENT_COMPLETE));
+            fProgress.setMinimum(min.intValue());
+            fProgress.setMaximum(max.intValue());
+            if (cur != null)
+            {
+                fProgress.setValue(cur.intValue());
+            }
         }
     }
 }

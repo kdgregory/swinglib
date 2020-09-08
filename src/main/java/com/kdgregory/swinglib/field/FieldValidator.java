@@ -33,11 +33,11 @@ import javax.swing.text.JTextComponent;
  */
 public class FieldValidator
 {
-    private JTextComponent _component;
-    private Document _document;
-    private Pattern _regex;
-    private Color _normalColor;
-    private Color _highlightColor;
+    private JTextComponent component;
+    private Document document;
+    private Pattern regex;
+    private Color normalColor;
+    private Color highlightColor;
 
 
     /**
@@ -52,9 +52,9 @@ public class FieldValidator
      */
     public FieldValidator(JTextComponent component, String regex)
     {
-        _component = component;
-        _document = component.getDocument();
-        _regex = Pattern.compile(regex);
+        this.component = component;
+        this.document = component.getDocument();
+        this.regex = Pattern.compile(regex);
     }
 
 
@@ -101,9 +101,9 @@ public class FieldValidator
                           Color highlight, Color normal)
     {
         this(component, regex);
-        _highlightColor = highlight;
-        _normalColor = normal;
-        _document.addDocumentListener(new MyDocumentListener());
+        this.highlightColor = highlight;
+        this.normalColor = normal;
+        this.document.addDocumentListener(new MyDocumentListener());
         validateAndHighlight();
     }
 
@@ -119,11 +119,11 @@ public class FieldValidator
      */
     public boolean isValid()
     {
-        int len = _document.getLength();
+        int len = document.getLength();
         try
         {
-            String text = _document.getText(0, len);
-            return _regex.matcher(text).matches();
+            String text = document.getText(0, len);
+            return regex.matcher(text).matches();
         }
         catch (BadLocationException e)
         {
@@ -143,9 +143,9 @@ public class FieldValidator
         // collected; we don't care that it still holds a reference to us
         // via the listener
 
-        _document = _component.getDocument();
-        if (_highlightColor != null)
-            _document.addDocumentListener(new MyDocumentListener());
+        document = component.getDocument();
+        if (highlightColor != null)
+            document.addDocumentListener(new MyDocumentListener());
     }
 
 
@@ -158,9 +158,9 @@ public class FieldValidator
     private void validateAndHighlight()
     {
         if (isValid())
-            _component.setBackground(_normalColor);
+            component.setBackground(normalColor);
         else
-            _component.setBackground(_highlightColor);
+            component.setBackground(highlightColor);
     }
 
 
@@ -168,16 +168,19 @@ public class FieldValidator
     private class MyDocumentListener
     implements DocumentListener
     {
+        @Override
         public void changedUpdate(DocumentEvent e)
         {
             validateAndHighlight();
         }
 
+        @Override
         public void insertUpdate(DocumentEvent e)
         {
             validateAndHighlight();
         }
 
+        @Override
         public void removeUpdate(DocumentEvent e)
         {
             validateAndHighlight();

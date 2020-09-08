@@ -33,7 +33,7 @@ import javax.swing.JComponent;
  */
 public class CursorManager
 {
-    private WeakHashMap<JComponent,LinkedList<Cursor>> _cursors
+    private WeakHashMap<JComponent,LinkedList<Cursor>> cursors
             = new WeakHashMap<JComponent,LinkedList<Cursor>>();
 
 
@@ -84,11 +84,11 @@ public class CursorManager
 
     private LinkedList<Cursor> getCursorStackFor(JComponent comp)
     {
-        LinkedList<Cursor> stack = _cursors.get(comp);
+        LinkedList<Cursor> stack = cursors.get(comp);
         if (stack == null)
         {
             stack = new LinkedList<Cursor>();
-            _cursors.put(comp, stack);
+            cursors.put(comp, stack);
         }
         return stack;
     }

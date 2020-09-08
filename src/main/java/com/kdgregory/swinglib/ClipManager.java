@@ -54,6 +54,7 @@ public class ClipManager
     private static class ClipCallback
     implements ClipboardOwner
     {
+        @Override
         public void lostOwnership(Clipboard clipboard, Transferable contents)
         {
             // nothing happening here
@@ -67,32 +68,35 @@ public class ClipManager
     private static class StringClip
     implements Transferable
     {
-        private String _str;
-        private DataFlavor _myFlavor;
+        private String str;
+        private DataFlavor myFlavor;
 
         public StringClip(String str)
         {
-            _str = str;
-            _myFlavor = DataFlavor.stringFlavor;
+            this.str = str;
+            this.myFlavor = DataFlavor.stringFlavor;
         }
 
+        @Override
         public Object getTransferData(DataFlavor flavor)
         throws UnsupportedFlavorException, IOException
         {
-            if (!flavor.equals(_myFlavor))
+            if (!flavor.equals(myFlavor))
                 return null;
 
-            return _str;
+            return str;
         }
 
+        @Override
         public DataFlavor[] getTransferDataFlavors()
         {
-            return new DataFlavor[] { _myFlavor };
+            return new DataFlavor[] { myFlavor };
         }
 
+        @Override
         public boolean isDataFlavorSupported(DataFlavor flavor)
         {
-            return flavor.equals(_myFlavor);
+            return flavor.equals(myFlavor);
         }
     }
 }

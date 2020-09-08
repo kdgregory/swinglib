@@ -41,16 +41,16 @@ extends DefaultTableCellRenderer
 
         //--------------------------------------------------------------------
 
-        private int _swingAlign;
+        private int swingAlign;
 
-        private Alignment(int swingAlign)
+        private Alignment(int value)
         {
-            _swingAlign = swingAlign;
+            swingAlign = value;
         }
 
         public int getSwingAlignment()
         {
-            return _swingAlign;
+            return swingAlign;
         }
     }
 
@@ -59,7 +59,7 @@ extends DefaultTableCellRenderer
 //  Instance Variables and Constructor
 //----------------------------------------------------------------------------
 
-    private Format _formatter;
+    private Format formatter;
 
 
     /**
@@ -91,7 +91,7 @@ extends DefaultTableCellRenderer
     {
         super();
         setHorizontalAlignment(alignment.getSwingAlignment());
-        _formatter = formatter;
+        this.formatter = formatter;
     }
 
 
@@ -104,7 +104,7 @@ extends DefaultTableCellRenderer
     {
         String text = (value == null)
                     ? ""
-                    : _formatter.format(value);
+                    : formatter.format(value);
         setText(text);
     }
 }

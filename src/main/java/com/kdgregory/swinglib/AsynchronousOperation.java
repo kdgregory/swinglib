@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 public abstract class AsynchronousOperation<T>
 implements Runnable
 {
+    @Override
     public final void run()
     {
         try
@@ -42,6 +43,7 @@ implements Runnable
             final T result = performOperation();
             SwingUtilities.invokeLater(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     onComplete();
@@ -53,6 +55,7 @@ implements Runnable
         {
             SwingUtilities.invokeLater(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     onComplete();
