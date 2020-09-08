@@ -105,6 +105,14 @@ extends TestCase
         });
     }
 
+//----------------------------------------------------------------------------
+//  Helpers
+//----------------------------------------------------------------------------
+
+    private static void assertCursorType(String message, Cursor c1, Cursor c2)
+    {
+        assertEquals(message, c1.getType(), c2.getType());
+    }
 
 //----------------------------------------------------------------------------
 //  Test Cases
@@ -122,8 +130,8 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(defaultCursor, comp1Cursor);
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("initial label cursor",     defaultCursor, comp1Cursor);
+        assertCursorType("initial textfield cursor", textCursor,    comp2Cursor);
 
         // now change the label, and ensure that we didn't touch the textfield
         SwingUtilities.invokeAndWait(new Runnable()
@@ -136,8 +144,8 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp1Cursor);
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("label cursor",     waitCursor, comp1Cursor);
+        assertCursorType("textfield cursor", textCursor, comp2Cursor);
 
         // now pop it off and ensure that we return to default
         SwingUtilities.invokeAndWait(new Runnable()
@@ -150,8 +158,8 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(defaultCursor, comp1Cursor);
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("label cursor",     defaultCursor, comp1Cursor);
+        assertCursorType("textfield cursor", textCursor, comp2Cursor);
     }
 
 
@@ -167,7 +175,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("initial cursor", textCursor, comp2Cursor);
 
         // now change it
         SwingUtilities.invokeAndWait(new Runnable()
@@ -179,7 +187,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp2Cursor);
+        assertCursorType("after push", waitCursor, comp2Cursor);
 
         // and back
         SwingUtilities.invokeAndWait(new Runnable()
@@ -191,7 +199,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("after pop", textCursor, comp2Cursor);
     }
 
 
@@ -207,7 +215,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("initial cursor", textCursor, comp2Cursor);
 
         // now change it
         SwingUtilities.invokeAndWait(new Runnable()
@@ -219,7 +227,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp2Cursor);
+        assertCursorType("after push", waitCursor, comp2Cursor);
 
         // and back
         SwingUtilities.invokeAndWait(new Runnable()
@@ -231,7 +239,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("after pop", textCursor, comp2Cursor);
 
         // and try another pop
         SwingUtilities.invokeAndWait(new Runnable()
@@ -250,7 +258,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("after second pop", textCursor, comp2Cursor);
         assertNull(exception);
     }
 
@@ -267,7 +275,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("initial cursor", textCursor, comp2Cursor);
 
         // now change it
         SwingUtilities.invokeAndWait(new Runnable()
@@ -279,7 +287,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp2Cursor);
+        assertCursorType("after push", waitCursor, comp2Cursor);
 
         // and back
         SwingUtilities.invokeAndWait(new Runnable()
@@ -291,7 +299,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("after pop", textCursor, comp2Cursor);
     }
 
 
@@ -306,7 +314,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("initial cursor", textCursor, comp2Cursor);
 
         // now change it
         SwingUtilities.invokeAndWait(new Runnable()
@@ -318,7 +326,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp2Cursor);
+        assertCursorType("after first push", waitCursor, comp2Cursor);
 
         // and again
         SwingUtilities.invokeAndWait(new Runnable()
@@ -330,7 +338,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(crosshairCursor, comp2Cursor);
+        assertCursorType("after second push", crosshairCursor, comp2Cursor);
 
         // back to the first push
         SwingUtilities.invokeAndWait(new Runnable()
@@ -342,7 +350,7 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(waitCursor, comp2Cursor);
+        assertCursorType("after first pop", waitCursor, comp2Cursor);
 
         // and back to the original
         SwingUtilities.invokeAndWait(new Runnable()
@@ -354,6 +362,6 @@ extends TestCase
                 comp2Cursor = comp2.getCursor();
             }
         });
-        assertEquals(textCursor, comp2Cursor);
+        assertCursorType("after second pop", textCursor, comp2Cursor);
     }
 }
