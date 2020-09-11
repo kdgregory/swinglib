@@ -24,7 +24,8 @@ import com.kdgregory.swinglib.components.ProgressMonitor;
 
 /**
  *  Uses {@link net.sf.swinglib.components.ProgressMonitor} to display
- *  a dialog and update it from the main thread.
+ *  a dialog and update it from the main thread. Note that this program
+ *  does not create a panel.
  */
 public class ProgressMonitorExample
 {
@@ -37,6 +38,7 @@ public class ProgressMonitorExample
         {
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 System.exit(0);

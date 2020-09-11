@@ -35,6 +35,7 @@ public class CompactGridExample
     {
         SwingUtilities.invokeAndWait(new Runnable()
         {
+            @Override
             public void run()
             {
                 JFrame frame = new JFrame("CompactGridExample");
