@@ -6,7 +6,7 @@
 	<groupId>com.kdgregory.util</groupId>
 	<artifactId>swinglib</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>swinglib</name>
 	<url>https://github.com/kdgregory/swinglib</url>
@@ -14,14 +14,6 @@
 	<description>
 		A collection of utility classes for Swing applications.
 	</description>
-
-	<developers>
-		<developer>
-			<id>kdgregory</id>
-			<name>Keith D Gregory</name>
-			<url>https://www.kdgregory.com</url>
-		</developer>
-	</developers>
 
 	<licenses>
 		<license>
@@ -31,6 +23,21 @@
 		</license>
 	</licenses>
 
+	<developers>
+		<developer>
+			<id>kdgregory</id>
+			<name>Keith D Gregory</name>
+			<url>https://www.kdgregory.com</url>
+		</developer>
+	</developers>
+
+
+    <scm>
+        <url>https://github.com/kdgregory/swinglib</url>
+        <connection>scm:git:https://github.com/kdgregory/swinglib.git</connection>
+        <developerConnection>scm:git:https://github.com/kdgregory/swinglib.git</developerConnection>
+    </scm>
+
 
     <properties>
         <jdk.version>1.8</jdk.version>
@@ -38,13 +45,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- yes, this is old, but it works and I see no need to update the tests -->
         <junit.version>3.8.2</junit.version>
 
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-        <maven-changes-plugin.version>2.11</maven-changes-plugin.version>
-        <findbugs-plugin.version>3.0.5</findbugs-plugin.version>
         <cobertura-plugin.version>2.7</cobertura-plugin.version>
     </properties>
 
@@ -85,13 +91,6 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
-                    <bottom>
-                        &lt;a
-                        href="http://sourceforge.net/projects/kdgcommons/"&gt;
-                        &lt;img
-                        src="http://sflogo.sourceforge.net/sflogo.php?group_id=234884&amp;type=3"&gt;
-                        &lt;/a&gt;
-                    </bottom>
                     <doclint>none</doclint>
                 </configuration>
             </plugin>
@@ -114,29 +113,6 @@
                         </execution>
                     </executions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs-plugin.version}</version>
-                <configuration>
-                    <excludeFilterFile>src/site/findbugs-filter.xml</excludeFilterFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-changes-plugin</artifactId>
-                <version>${maven-changes-plugin.version}</version>
-                <configuration>
-                    <xmlPath>${basedir}/src/site/changes.xml</xmlPath>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>changes-report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
         </plugins>
     </reporting>
